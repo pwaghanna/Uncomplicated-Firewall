@@ -165,3 +165,82 @@ Check its status -
 ### Lazy?
 
 If you are too lazy to type rules, Install a graphical uncomplicated firewall (GUFW). 
+
+
+## Secure Baseline Configuration
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
+```
+
+## Security Scenarios
+
+### Scenario 1: Secure SSH Access on a Production Server
+Allow administrative SSH access while reducing the risk of brute-force attacks and minimizing service exposure.
+- Restrict SSH access to a trusted subnet
+- Rate-limit bruteforce attempts
+- Log rejected connections
+
+Commands:
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
+sudo ufw limit ssh
+sudo ufw logging on
+sudo ufw enable
+```
+
+### Scenario 2: Secure SSH Access on a Production Server
+Expose only required web services to the internet while keeping all other ports inaccessible.
+- Allow inbound HTTP and HTTPS traffic
+- Deny all other incoming connections
+- Preserve outbound access for updates and APIs
+
+Commands:
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+```
+
+
+### Scenario 3: Internal-Only Database Server
+Protect a database service by allowing access only from trusted internal application servers.
+- Deny all public access to the database port
+- Allow connections only from a private subnet
+
+Commands:
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow from 10.0.0.0/8 to any port 5432 proto tcp
+sudo ufw enable
+```
+
+### Scenario 3: Bruteforce Protection for Login Sensitive Services
+Protect services such as SSH, RDP, or admin login APIs from repeated authentication attempts.
+- Apply connection rate limiting
+- Drop excessive connection attempts silently
+
+Commands:
+```bash
+sudo ufw limit 22/tcp
+```
+
+## Common Mistakes
+
+- Locking yourself out of SSH by enabling UFW before allowing port 22
+- Using deny instead of reject when debugging
+- Forgetting rule order precedence
+
+## Scope & Ethics
+
+This repository is intended for defensive security, system hardening, and educational use only.
+All examples assume systems you own or have explicit permission to configure.
